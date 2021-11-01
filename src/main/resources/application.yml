@@ -1,5 +1,5 @@
 server.port: 9091
 kafka:
- bootstrapAddress: localhost:9092
+ bootstrap_address: localhost:9092
  topic-name: testik
  group_id: testGroup
