@@ -9,23 +9,17 @@ import org.springframework.kafka.core.KafkaAdmin
 
 
 @Configuration
-class KafkaTopicConfig {
-
-    @Value("\${kafka.bootstrapAddress}")
-    private val bootstrapAddress: String? = null
-
-    @Value("\${kafka.topic-name}")
-    private val topicName: String? = null
+class KafkaTopicConfig(private var kafkaProperties: KafkaProperties) {
 
     @Bean
     fun kafkaAdmin(): KafkaAdmin {
         val configs: MutableMap<String, Any> = HashMap()
-        configs[AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG] = bootstrapAddress!!
+        configs[AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaProperties.bootstrapAddress!!
         return KafkaAdmin(configs)
     }
 
     @Bean
     fun topic1(): NewTopic? {
-        return NewTopic(topicName, 1, 1.toShort())
+        return NewTopic(kafkaProperties.topicName, 1, 1.toShort())
     }
 }

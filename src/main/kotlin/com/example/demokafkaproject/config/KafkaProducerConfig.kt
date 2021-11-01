@@ -11,17 +11,12 @@ import org.springframework.kafka.core.ProducerFactory
 
 
 @Configuration
-class KafkaProducerConfig {
-
-    @Value("\${kafka.bootstrapAddress}")
-    private val bootstrapAddress: String? = null
-
-
+class KafkaProducerConfig(private var kafkaProperties: KafkaProperties) {
 
     @Bean
     fun producerFactory(): ProducerFactory<String, String> {
         val configProps: MutableMap<String, Any> = HashMap()
-        configProps[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = bootstrapAddress!!
+        configProps[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaProperties.bootstrapAddress!!
         configProps[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
         configProps[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
         return DefaultKafkaProducerFactory(configProps)
