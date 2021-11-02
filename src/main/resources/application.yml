@@ -1,6 +1,6 @@
 server.port: 9091
 kafka:
- bootstrap_address: must-rename37
+ bootstrap_address: 172.26.0.5:9092
  topic-name: testik
  group_id: testGroup
 
