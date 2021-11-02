@@ -24,6 +24,10 @@ services:
     image: docker.io/elkozmon/zoonavigator
     ports:
       - "9000:9000"
+  kotlinProject:
+    image: demo_kafka_project:latest
+    ports:
+      - "9091:9091"
 
 volumes:
   zookeeper_data:

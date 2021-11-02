@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: kotlin-project
+  cloud:
+    zookeeper:
+      connect-string: "172.26.0.2:2181"
+      enabled: true
+      config:
+        root: '/dd/configs'
+        enabled: true
+        defaultContext: 'default'
+        profileSeparator: '::'
