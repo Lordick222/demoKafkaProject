@@ -28,9 +28,18 @@ services:
     image: demo_kafka_project:latest
     ports:
       - "9091:9091"
+  elasticsearch:
+    image: docker.io/bitnami/elasticsearch:latest
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    volumes:
+      - 'elasticsearch_data:/bitnami/elasticsearch/data'
 
 volumes:
   zookeeper_data:
     driver: local
   kafka_data:
+    driver: local
+  elasticsearch_data:
     driver: local
