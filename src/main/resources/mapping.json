@@ -1,0 +1,36 @@
+{
+  "settings": {
+    "index.number_of_replicas": 1,
+    "index.number_of_shards": 2,
+    "index.refresh_interval": "30s",
+    "index.codec": "best_compression",
+    "index.sort.field": [
+      "year",
+      "id"
+    ],
+    "index.sort.order": [
+      "desc",
+      "asc"
+    ]
+  },
+  "mappings": {
+    "dynamic": "strict",
+    "properties": {
+      "properties": {
+        "enabled": false
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "year": {
+        "type": "date"
+      },
+      "mark": {
+        "type": "keyword"
+      },
+      "mileage": {
+        "type": "integer"
+      }
+    }
+  }
+}

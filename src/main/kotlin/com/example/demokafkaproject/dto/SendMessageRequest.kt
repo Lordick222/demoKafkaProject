@@ -1,4 +1,4 @@
-package com.example.demokafkaproject.controller.dto
+package com.example.demokafkaproject.dto
 
 data class SendMessageRequest(
     var message: String? = null

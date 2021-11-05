@@ -1,20 +1,23 @@
 server.port: 9091
 kafka:
- bootstrap_address: 172.26.0.5:9092
- topic-name: testik
- group_id: testGroup
+  bootstrap_address: localhost:9092
+  topic-name: testik
+  group_id: testGroup
+
+elastic:
+  host: localhost:9200
 
 spring:
- application:
-  name: "kotlin-project"
- cloud:
-  bootstrap:
-   enabled: true
-  zookeeper:
-   connect-string: 172.26.0.2:2181
-   enabled: true
-   config:
-    root: '/dd/configs'
-    enabled: true
-    defaultContext: 'default'
-    profileSeparator: '::'
+  application:
+    name: "kotlin-project"
+  cloud:
+    bootstrap:
+      enabled: true
+    zookeeper:
+      connect-string: localhost:2181
+      enabled: true
+      config:
+        root: '/dd/configs'
+        enabled: true
+        defaultContext: 'default'
+        profileSeparator: '::'
