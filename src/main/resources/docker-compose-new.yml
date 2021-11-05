@@ -1,15 +1,38 @@
-version: "2"
+version: '3.8'
+volumes:
+  zksingle-ksingle_kafka1-data:
+    driver: local
+  zksingle-ksingle_zoo1-data:
+    driver: local
+  zksingle-ksingle_zoo1-log:
+    driver: local
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
 
 services:
-  zookeeper:
-    image: docker.io/bitnami/zookeeper:3.7
+  zoo1:
+    image: confluentinc/cp-zookeeper:6.2.1
+    hostname: zoo1
+    container_name: zoo1
     ports:
       - "2181:2181"
-    volumes:
-      - "zookeeper_data:/bitnami"
     environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
-  kafka:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_SERVERS: zoo1:2888:3888
+    volumes:
+      - type: volume
+        source: zksingle-ksingle_zoo1-data
+        target: /data
+      - type: volume
+        source: zksingle-ksingle_zoo1-log
+        target: /datalog
+
+  kafka1:
     image: confluentinc/cp-kafka:6.2.1
     hostname: kafka1
     user: "appuser:appuser"
@@ -20,7 +43,7 @@ services:
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181"
       KAFKA_BROKER_ID: 1
       KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -33,15 +56,11 @@ services:
         source: zksingle-ksingle_kafka1-data
         target: /var/lib/kafka/data
     depends_on:
-      - zookeeper
+      - zoo1
   zoonavigator:
     image: docker.io/elkozmon/zoonavigator
     ports:
       - "9000:9000"
-  kotlinProject:
-    image: demo_kafka_project:latest
-    ports:
-      - "9091:9091"
   elasticsearch:
     image: docker.io/bitnami/elasticsearch:latest
     ports:
@@ -49,17 +68,21 @@ services:
       - '9300:9300'
     volumes:
       - 'elasticsearch_data:/bitnami/elasticsearch/data'
+  kotlinProject:
+    image: demo_kafka_project:latest
+    ports:
+      - "9091:9091"
   kafka-connect:
     image: confluentinc/cp-kafka-connect:5.3.1
     ports:
       - 8083:8083
     depends_on:
-      - zookeeper
-      - kafka
+      - zoo1
+      - kafka1
     volumes:
       - $PWD/connect-plugins:/connect-plugins
     environment:
-      CONNECT_BOOTSTRAP_SERVERS: kafka:9092
+      CONNECT_BOOTSTRAP_SERVERS: kafka1:9092
       CONNECT_REST_PORT: 8083
       CONNECT_GROUP_ID: kafka-connect
       CONNECT_CONFIG_STORAGE_TOPIC: docker-kafka-connect-configs
@@ -82,13 +105,3 @@ services:
       CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
       CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
       CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.3.1.jar
-
-volumes:
-  zookeeper_data:
-    driver: local
-  kafka_data:
-    driver: local
-  elasticsearch_data:
-    driver: local
-  zksingle-ksingle_kafka1-data:
-    driver: local
