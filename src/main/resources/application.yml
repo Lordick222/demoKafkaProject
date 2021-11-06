@@ -1,11 +1,11 @@
 server.port: 9091
 kafka:
-  bootstrap_address: localhost:9092
-  topic-name: testik
-  group_id: testGroup
+  bootstrap_address: 172.21.0.6:9092
+  topic-name: cars6
+  group_id: testGroup2
 
 elastic:
-  host: localhost:9200
+  host: 172.21.0.4:9200
 
 spring:
   application:
@@ -14,7 +14,7 @@ spring:
     bootstrap:
       enabled: true
     zookeeper:
-      connect-string: localhost:2181
+      connect-string: 172.21.0.5:2181
       enabled: true
       config:
         root: '/dd/configs'
