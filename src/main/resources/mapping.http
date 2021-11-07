@@ -1,12 +1,15 @@
+PUT http://localhost:9200/cars8
+Content-Type: application/json
+
 {
   "settings": {
-    "index.number_of_replicas": 1,
+    "index.number_of_replicas": 0,
     "index.number_of_shards": 2,
     "index.refresh_interval": "30s",
     "index.codec": "best_compression",
     "index.sort.field": [
       "year",
-      "id"
+      "car_id"
     ],
     "index.sort.order": [
       "desc",
@@ -14,16 +17,16 @@
     ]
   },
   "mappings": {
-    "dynamic": "strict",
     "properties": {
       "properties": {
         "enabled": false
       },
-      "id": {
+      "car_id": {
         "type": "keyword"
       },
       "year": {
-        "type": "date"
+        "type": "date",
+        "format": "yyyy-MM-dd"
       },
       "mark": {
         "type": "keyword"
@@ -34,3 +37,5 @@
     }
   }
 }
+
+###
