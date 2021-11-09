@@ -1,19 +1,17 @@
-###
-#Create connector
-POST http://localhost:8083/connectors
+POST http://localhost:8084/connectors
 Content-Type: application/json
 
 {
-  "name": "simple-elasticsearch-connector",
+  "name": "inventory-connector",
   "config": {
-    "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
-    "connection.url": "http://172.21.0.4:9200",
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
     "tasks.max": "1",
-    "topics": "cars7",
-    "type.name": "_doc",
-    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
-    "value.converter.schemas.enable": "false",
-    "schema.ignore": "true",
-    "key.ignore": "true"
+    "database.hostname": "0.0.0.0",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "postgres",
+    "database.dbname" : "postgres",
+    "database.server.name": "dbserver1",
+    "schema.whitelist": "inventory"
   }
 }
