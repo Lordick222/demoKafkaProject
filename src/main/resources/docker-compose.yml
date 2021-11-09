@@ -9,6 +9,8 @@ services:
       - "zookeeper_data:/bitnami"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - bridge
   kafka:
     image: docker.io/bitnami/kafka:3
     ports:
@@ -25,15 +27,8 @@ services:
       - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
     depends_on:
       - zookeeper
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    ports:
-      - 9100:9000
-    environment:
-      - KAFKA_BROKERCONNECT=kafka:9092
-      - JVM_OPTS=-Xms32M -Xmx64M
-    depends_on:
-      - kafka
+    networks:
+      - bridge
   kafka-ui:
     image: provectuslabs/kafka-ui
     container_name: kafka-ui
@@ -47,14 +42,20 @@ services:
     depends_on:
       - zookeeper
       - kafka
+    networks:
+      - bridge
   zoonavigator:
     image: docker.io/elkozmon/zoonavigator
     ports:
       - "9000:9000"
+    networks:
+      - bridge
   kotlinProject:
     image: demo_kafka_project:latest
     ports:
       - "9091:9091"
+    networks:
+      - bridge
   elasticsearch:
     image: docker.io/bitnami/elasticsearch:latest
     ports:
@@ -62,6 +63,8 @@ services:
       - '9300:9300'
     volumes:
       - 'elasticsearch_data:/bitnami/elasticsearch/data'
+    networks:
+      - bridge
   pg_db:
     image: postgres
     restart: always
@@ -73,6 +76,8 @@ services:
       - pg_project:/var/lib/postgresql/data
     ports:
       - ${POSTGRES_PORT:-5432}:5432
+    networks:
+      - bridge
   kafka-connect:
     image: confluentinc/cp-kafka-connect:5.3.1
     ports:
@@ -82,6 +87,8 @@ services:
       - kafka
     volumes:
       - $PWD/connect-plugins:/connect-plugins
+    networks:
+      - bridge
     environment:
       CONNECT_BOOTSTRAP_SERVERS: kafka:9092
       CONNECT_REST_PORT: 8083
@@ -106,6 +113,26 @@ services:
       CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
       CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
       CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.3.1.jar
+  connect:
+    image: debezium/connect
+    ports:
+      - "8084:8084"
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
+      GROUP_ID: 2
+      CONNECT_CONFIG_STORAGE_TOPIC: my_connect_configs
+      CONNECT_OFFSET_STORAGE_TOPIC: my_connect_offsets
+      CONNECT_STATUS_STORAGE_TOPIC: my_connect_statuses
+      CONFIG_STORAGE_TOPIC: my_storage_topic
+      OFFSET_STORAGE_TOPIC: my_offset_storage_topic
+    depends_on:
+      - zookeeper
+      - kafka
+    networks:
+      - bridge
+
+
+
 
 volumes:
   zookeeper_data:
@@ -118,3 +145,21 @@ volumes:
     driver: local
   pg_project:
     driver: local
+
+networks:
+  bridge:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.10.1.0/16
+          gateway: 172.10.1.1
+          aux_addresses:
+            kafka-connect: 172.10.1.10
+            pg_db: 172.10.1.20
+            elasticsearch: 172.10.1.30
+            kotlinProject: 172.10.1.40
+            zoonavigator: 172.10.1.50
+            kafka-ui: 172.10.1.60
+            kafka: 172.10.1.70
+            zookeeper: 172.10.1.80
+            connect: 172.10.1.90
