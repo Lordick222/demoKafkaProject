@@ -2,17 +2,23 @@ POST http://localhost:8084/connectors
 Content-Type: application/json
 
 {
-  "name": "inventory-connector",
+  "name": "inventory-connector3",
   "config": {
     "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
     "database.hostname": "10.5.0.15",
-    "plugin.name": "pgoutput",
+    "tasks.max": "1",
+    "plugin.name": "wal2json",
     "database.port": "5432",
-    "database.user": "postgres",
-    "database.password": "secret",
-    "database.dbname" : "stage",
-    "database.server.name": "fullfillment",
-    "table.whitelist": "cars.car"
+    "database.user": "postgresuser",
+    "database.password": "postgrespw",
+    "database.dbname" : "shipment_db",
+    "database.server.name": "fullfillment3",
+    "table.whitelist": "cars.car",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter.schemas.enable": "false",
+    "snapshot.mode": "always"
   }
 }
 
@@ -25,4 +31,4 @@ GET http://localhost:8084/connector-plugins
 GET http://localhost:8084/connectors
 
 ###
-DELETE http://localhost:8084/connectors/inventory-connector
+DELETE http://localhost:8084/connectors/inventory-connector3

@@ -32,3 +32,8 @@ INSERT INTO cars.car
 VALUES('02c77284-e4c2-4125-926a-5752e7e23134', '2006-01-10', 'opel', 10078);
 
 
+ALTER SYSTEM SET wal_level = 'logical';
+SHOW wal_level;
+ALTER TABLE cars.car REPLICA IDENTITY FULL;
+select pg_drop_replication_slot('debezium');
+
