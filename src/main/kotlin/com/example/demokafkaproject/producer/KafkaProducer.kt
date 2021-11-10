@@ -8,10 +8,11 @@ import org.springframework.stereotype.Service
 class KafkaProducer(
     private var kafkaTemplate: KafkaTemplate<String, String>
 ) {
-    @Value("\${kafka.topic-name}")
+    @Value("\${kafka.produce-topic-name}")
     private val topicName: String? = null
 
     fun sendMessage(msg: String) {
         kafkaTemplate.send(topicName!!, msg)
+
     }
 }

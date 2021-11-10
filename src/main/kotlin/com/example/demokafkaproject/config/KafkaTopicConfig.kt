@@ -20,6 +20,6 @@ class KafkaTopicConfig(private var kafkaProperties: KafkaProperties) {
 
     @Bean
     fun topic1(): NewTopic? {
-        return NewTopic(kafkaProperties.topicName, 1, 1.toShort())
+        return NewTopic(kafkaProperties.produceTopicName, 1, 1.toShort())
     }
 }

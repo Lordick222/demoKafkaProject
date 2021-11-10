@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration
 @ConfigurationProperties(prefix = "kafka")
 class KafkaProperties {
     var bootstrapAddress: String? = null
-    var topicName: String? = null
+    var produceTopicName: String? = null
+    var consumeTopicName: String? = null
     var groupId: String? = null
 }

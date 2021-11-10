@@ -6,7 +6,6 @@ Content-Type: application/json
   "config": {
     "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
     "database.hostname": "10.5.0.15",
-    "tasks.max": "1",
     "plugin.name": "wal2json",
     "database.port": "5432",
     "database.user": "postgresuser",
@@ -17,8 +16,7 @@ Content-Type: application/json
     "key.converter": "org.apache.kafka.connect.json.JsonConverter",
     "value.converter": "org.apache.kafka.connect.json.JsonConverter",
     "key.converter.schemas.enable": "false",
-    "value.converter.schemas.enable": "false",
-    "snapshot.mode": "always"
+    "value.converter.schemas.enable": "false"
   }
 }
 
