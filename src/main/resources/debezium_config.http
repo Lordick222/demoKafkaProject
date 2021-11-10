@@ -5,13 +5,24 @@ Content-Type: application/json
   "name": "inventory-connector",
   "config": {
     "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
-    "tasks.max": "1",
-    "database.hostname": "0.0.0.0",
+    "database.hostname": "10.5.0.15",
+    "plugin.name": "pgoutput",
     "database.port": "5432",
     "database.user": "postgres",
-    "database.password": "postgres",
-    "database.dbname" : "postgres",
-    "database.server.name": "dbserver1",
-    "schema.whitelist": "inventory"
+    "database.password": "secret",
+    "database.dbname" : "stage",
+    "database.server.name": "fullfillment",
+    "table.whitelist": "cars.car"
   }
 }
+
+
+###
+
+GET http://localhost:8084/connector-plugins
+
+###
+GET http://localhost:8084/connectors
+
+###
+DELETE http://localhost:8084/connectors/inventory-connector

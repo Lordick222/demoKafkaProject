@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
   "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
-  "connection.url": "http://172.21.0.7:9200",
+  "connection.url": "http://10.5.0.20:9200",
   "tasks.max": "1",
   "topics": "cars7",
   "name": "simple-elasticsearch-connector",
@@ -23,7 +23,7 @@ Content-Type: application/json
   "name": "simple-elasticsearch-connector",
   "config": {
     "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
-    "connection.url": "http://172.21.0.4:9200",
+    "connection.url": "http://10.5.0.20:9200",
     "tasks.max": "1",
     "topics": "cars7",
     "type.name": "_doc",
@@ -39,4 +39,5 @@ Content-Type: application/json
 
 
 GET http://localhost:8083/connectors
+
 

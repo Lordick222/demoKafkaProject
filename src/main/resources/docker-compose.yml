@@ -10,7 +10,8 @@ services:
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
     networks:
-      - bridge
+      vpcbr:
+        ipv4_address: 10.5.0.45
   kafka:
     image: docker.io/bitnami/kafka:3
     ports:
@@ -28,7 +29,8 @@ services:
     depends_on:
       - zookeeper
     networks:
-      - bridge
+      vpcbr:
+        ipv4_address: 10.5.0.40
   kafka-ui:
     image: provectuslabs/kafka-ui
     container_name: kafka-ui
@@ -43,19 +45,22 @@ services:
       - zookeeper
       - kafka
     networks:
-      - bridge
+      vpcbr:
+        ipv4_address: 10.5.0.35
   zoonavigator:
     image: docker.io/elkozmon/zoonavigator
     ports:
       - "9000:9000"
     networks:
-      - bridge
+      vpcbr:
+        ipv4_address: 10.5.0.30
   kotlinProject:
     image: demo_kafka_project:latest
     ports:
       - "9091:9091"
     networks:
-      - bridge
+      vpcbr:
+        ipv4_address: 10.5.0.25
   elasticsearch:
     image: docker.io/bitnami/elasticsearch:latest
     ports:
@@ -64,7 +69,8 @@ services:
     volumes:
       - 'elasticsearch_data:/bitnami/elasticsearch/data'
     networks:
-      - bridge
+      vpcbr:
+        ipv4_address: 10.5.0.20
   pg_db:
     image: postgres
     restart: always
@@ -77,7 +83,8 @@ services:
     ports:
       - ${POSTGRES_PORT:-5432}:5432
     networks:
-      - bridge
+      vpcbr:
+        ipv4_address: 10.5.0.15
   kafka-connect:
     image: confluentinc/cp-kafka-connect:5.3.1
     ports:
@@ -88,7 +95,8 @@ services:
     volumes:
       - $PWD/connect-plugins:/connect-plugins
     networks:
-      - bridge
+      vpcbr:
+        ipv4_address: 10.5.0.10
     environment:
       CONNECT_BOOTSTRAP_SERVERS: kafka:9092
       CONNECT_REST_PORT: 8083
@@ -116,20 +124,39 @@ services:
   connect:
     image: debezium/connect
     ports:
-      - "8084:8084"
+      - "8084:8083"
     environment:
       BOOTSTRAP_SERVERS: kafka:9092
-      GROUP_ID: 2
-      CONNECT_CONFIG_STORAGE_TOPIC: my_connect_configs
-      CONNECT_OFFSET_STORAGE_TOPIC: my_connect_offsets
-      CONNECT_STATUS_STORAGE_TOPIC: my_connect_statuses
-      CONFIG_STORAGE_TOPIC: my_storage_topic
-      OFFSET_STORAGE_TOPIC: my_offset_storage_topic
+      GROUP_ID: connect-debezium
+      CONFIG_STORAGE_TOPIC: docker-connect-debezium-configs
+      OFFSET_STORAGE_TOPIC: docker-connect-debezium-offsets
+      STATUS_STORAGE_TOPIC: docker-connect-debezium-status
+      KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
     depends_on:
       - zookeeper
       - kafka
     networks:
-      - bridge
+      vpcbr:
+        ipv4_address: 10.5.0.5
+  schema-registry:
+    image: confluentinc/cp-schema-registry:5.5.1
+    hostname: schema-registry
+    container_name: schema-registry
+    depends_on:
+      - zookeeper
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: 'http://0.0.0.0:8081'
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'PLAINTEXT://kafka:9092'
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.50
 
 
 
@@ -147,19 +174,9 @@ volumes:
     driver: local
 
 networks:
-  bridge:
+  vpcbr:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.10.1.0/16
-          gateway: 172.10.1.1
-          aux_addresses:
-            kafka-connect: 172.10.1.10
-            pg_db: 172.10.1.20
-            elasticsearch: 172.10.1.30
-            kotlinProject: 172.10.1.40
-            zoonavigator: 172.10.1.50
-            kafka-ui: 172.10.1.60
-            kafka: 172.10.1.70
-            zookeeper: 172.10.1.80
-            connect: 172.10.1.90
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1
